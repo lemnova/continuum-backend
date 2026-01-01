@@ -17,7 +17,7 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String name;
+    private String username;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -25,10 +25,10 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    /*@OneToMany(
-       //mappedBy = "user",
-        //cascade = CascadeType.ALL,
-        //orphanRemoval = true
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
     )
-    private List<Meta> metas; */
+    private List<Habit> Habits;
 }

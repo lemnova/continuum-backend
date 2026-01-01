@@ -47,8 +47,10 @@ public class UserService {
         userEntity.setEmail(
             user.getEmail() != null ? user.getEmail() : userEntity.getEmail()
         );
-        userEntity.setName(
-            user.getName() != null ? user.getName() : userEntity.getName()
+        userEntity.setUsername(
+            user.getUsername() != null
+                ? user.getUsername()
+                : userEntity.getUsername()
         );
         userEntity.setPassword(
             user.getPassword() != null
