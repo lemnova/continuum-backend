@@ -1,4 +1,4 @@
-package tech.lemnova.continuum_backend.entitys;
+package tech.lemnova.continuum_backend.entities;
 
 import jakarta.persistence.*;
 import java.util.List;

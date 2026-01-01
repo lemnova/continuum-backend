@@ -2,8 +2,8 @@ package tech.lemnova.continuum_backend.services;
 
 import org.springframework.stereotype.Service;
 import tech.lemnova.continuum_backend.dtos.UserDTO;
-import tech.lemnova.continuum_backend.entitys.User;
-import tech.lemnova.continuum_backend.repositorys.UserRepository;
+import tech.lemnova.continuum_backend.entities.User;
+import tech.lemnova.continuum_backend.repositories.UserRepository;
 
 @Service
 public class UserService {

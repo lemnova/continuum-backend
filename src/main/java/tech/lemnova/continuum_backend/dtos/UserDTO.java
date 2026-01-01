@@ -1,6 +1,6 @@
 package tech.lemnova.continuum_backend.dtos;
 
-import tech.lemnova.continuum_backend.entitys.User;
+import tech.lemnova.continuum_backend.entities.User;
 
 public record UserDTO(long id, String name, String email) {
     public static UserDTO from(User user) {
