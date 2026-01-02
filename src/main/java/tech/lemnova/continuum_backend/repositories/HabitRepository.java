@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import tech.lemnova.continuum_backend.entities.Habit;
 
 public interface HabitRepository extends JpaRepository<Habit, Long> {
-    List<Habit> findByUserId(Long userId);
+    List<Habit> findAllByUserId(Long userId);
 }

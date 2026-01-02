@@ -1,10 +1,11 @@
 package tech.lemnova.continuum_backend.services;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import tech.lemnova.continuum_backend.dtos.habit.HabitUpdateDTO;
 import tech.lemnova.continuum_backend.dtos.habit.HabitDTO;
 import tech.lemnova.continuum_backend.dtos.habit.HabitCreateDTO;
 import org.springframework.stereotype.Service;
-import tech.lemnova.continuum_backend.dtos.*;
 import tech.lemnova.continuum_backend.entities.*;
 import tech.lemnova.continuum_backend.repositories.*;
 
@@ -20,6 +21,19 @@ public class HabitService {
     ) {
         this.habitRepository = habitRepository;
         this.userRepository = userRepository;
+    }
+    
+    public List<HabitDTO> listByUser(Long userId) {
+
+    if (!userRepository.existsById(userId)) {
+        throw new RuntimeException("User not found");
+    }
+
+    return habitRepository
+        .findAllByUserId(userId)
+        .stream()
+        .map(HabitDTO::from)
+        .collect(Collectors.toList());
     }
 
     // CREATE

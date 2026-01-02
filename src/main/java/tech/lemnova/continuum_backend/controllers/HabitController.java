@@ -1,12 +1,13 @@
 package tech.lemnova.continuum_backend.controllers;
 
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tech.lemnova.continuum_backend.dtos.habit.*;
 import tech.lemnova.continuum_backend.services.HabitService;
 
 @RestController
-@RequestMapping("/habits")
+@RequestMapping("/users/{userId}/habits")
 public class HabitController {
 
     private final HabitService habitService;
@@ -16,40 +17,53 @@ public class HabitController {
     }
 
     // CREATE
-    @PostMapping("/user/{userId}")
+    @PostMapping
     public ResponseEntity<HabitDTO> create(
         @PathVariable Long userId,
         @RequestBody HabitCreateDTO dto
     ) {
-        HabitDTO habit = habitService.create(userId, dto);
-        return ResponseEntity.ok(habit);
+        return ResponseEntity.ok(
+            habitService.create(userId, dto)
+        );
     }
 
-    // READ
-    @GetMapping("/{id}")
-    public ResponseEntity<HabitDTO> read(
-        @PathVariable Long id
+    // LIST ALL (by user)
+    @GetMapping
+    public ResponseEntity<List<HabitDTO>> list(
+        @PathVariable Long userId
     ) {
-        HabitDTO habit = habitService.read(id);
-        return ResponseEntity.ok(habit);
+        return ResponseEntity.ok(
+            habitService.listByUser(userId)
+        );
+    }
+
+    // READ (single habit)
+    @GetMapping("/{habitId}")
+    public ResponseEntity<HabitDTO> read(
+        @PathVariable Long habitId
+    ) {
+        return ResponseEntity.ok(
+            habitService.read(habitId)
+        );
     }
 
     // UPDATE
-    @PutMapping("/{id}")
+    @PutMapping("/{habitId}")
     public ResponseEntity<HabitDTO> update(
-        @PathVariable Long id,
+        @PathVariable Long habitId,
         @RequestBody HabitUpdateDTO dto
     ) {
-        HabitDTO habit = habitService.update(id, dto);
-        return ResponseEntity.ok(habit);
+        return ResponseEntity.ok(
+            habitService.update(habitId, dto)
+        );
     }
 
     // DELETE
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{habitId}")
     public ResponseEntity<Void> delete(
-        @PathVariable Long id
+        @PathVariable Long habitId
     ) {
-        habitService.delete(id);
+        habitService.delete(habitId);
         return ResponseEntity.noContent().build();
     }
 }
