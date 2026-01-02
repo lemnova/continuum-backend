@@ -1,4 +1,4 @@
-package tech.lemnova.continuum_backend.dtos;
+package tech.lemnova.continuum_backend.dtos.user;
 
 import tech.lemnova.continuum_backend.entities.User;
 

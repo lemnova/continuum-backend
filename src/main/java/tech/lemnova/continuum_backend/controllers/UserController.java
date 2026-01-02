@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import tech.lemnova.continuum_backend.dtos.UserDTO;
+import tech.lemnova.continuum_backend.dtos.user.UserDTO;
 import tech.lemnova.continuum_backend.entities.User;
 import tech.lemnova.continuum_backend.services.UserService;
 
