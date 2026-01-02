@@ -1,5 +1,6 @@
 package tech.lemnova.continuum_backend.services;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tech.lemnova.continuum_backend.dtos.UserDTO;
 import tech.lemnova.continuum_backend.entities.User;
@@ -9,15 +10,19 @@ import tech.lemnova.continuum_backend.repositories.UserRepository;
 public class UserService {
 
     private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public String create(User user) {
         if (repository.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("Email already registred");
         }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         User savedUser = repository.save(user);
         return "User created with ID: " + savedUser.getId();
@@ -52,11 +57,10 @@ public class UserService {
                 ? user.getUsername()
                 : userEntity.getUsername()
         );
-        userEntity.setPassword(
-            user.getPassword() != null
-                ? user.getPassword()
-                : userEntity.getPassword()
-        );
+        if (user.getPassword() != null){
+            userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        
 
         repository.saveAndFlush(userEntity);
 
