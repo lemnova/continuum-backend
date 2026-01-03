@@ -21,12 +21,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<String> create(@RequestBody User user) {
-        String response = userService.create(user);
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping
     public ResponseEntity<UserDTO> read(@RequestParam long id) {
         return ResponseEntity.ok(userService.read(id));

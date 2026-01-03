@@ -1,10 +1,5 @@
 package tech.lemnova.continuum_backend.dtos;
 
-public class AuthResponseDTO {
+import tech.lemnova.continuum_backend.dtos.user.UserDTO;
 
-    public String token;
-
-    public AuthResponseDTO(String token) {
-        this.token = token;
-    }
-}
+public record AuthResponseDTO(String token, UserDTO user){}
