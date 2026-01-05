@@ -36,10 +36,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // uncommet this line for active the localhost
-        //config.setAllowedOrigins(List.of("http://localhost:8081"));
-        // Frontend on render just for tests ! comment this later!
-        config.setAllowedOrigins(List.of("https://continuum-frontend.onrender.com"));
+        // uncommet this line for active the lovable tests
+        config.setAllowedOrigins(List.of("https://progress-peak-visor.lovable.app", "https://continuum-frontend.onrender.com"));
         config.setAllowedMethods(
             List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
         );
