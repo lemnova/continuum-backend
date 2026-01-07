@@ -4,15 +4,20 @@ import io.jsonwebtoken.Jwts;
 //import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tech.lemnova.continuum_backend.entities.User;
 
 @Service
 public class JwtService {
-
-    private static final String SECRET = "secret-key-test-super-hyper-mega-secret-3000-11-generation-hard-tech";
+    
+    private final String SECRET;
     private static final long EXPIRATION = 1000 * 60 * 60 * 24; // 24h
 
+    public JwtService(@Value("${SECRET}") String SECRET){
+        this.SECRET = SECRET;
+    }
+    
     public String generateToken(User user) {
         return Jwts.builder()
             .setSubject(user.getId().toString())
