@@ -24,6 +24,8 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+    
+    private Boolean status = false; 
 
     @OneToMany(
         mappedBy = "user",

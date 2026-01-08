@@ -1,8 +1,9 @@
-package tech.lemnova.continuum_backend.services;
+package tech.lemnova.continuum_backend.services.auth;
 
+import tech.lemnova.continuum_backend.services.auth.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import tech.lemnova.continuum_backend.dtos.AuthResponseDTO;
+import tech.lemnova.continuum_backend.dtos.auth.AuthResponseDTO;
 import tech.lemnova.continuum_backend.dtos.user.UserDTO;
 import tech.lemnova.continuum_backend.entities.User;
 import tech.lemnova.continuum_backend.repositories.UserRepository;

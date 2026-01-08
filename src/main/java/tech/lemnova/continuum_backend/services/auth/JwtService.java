@@ -1,4 +1,4 @@
-package tech.lemnova.continuum_backend.services;
+package tech.lemnova.continuum_backend.services.auth;
 
 import io.jsonwebtoken.Jwts;
 //import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,7 +14,7 @@ public class JwtService {
     private final String SECRET;
     private static final long EXPIRATION = 1000 * 60 * 60 * 24; // 24h
 
-    public JwtService(@Value("${SECRET}") String SECRET){
+    public JwtService(@Value("${JWT_SECRET}") String SECRET){
         this.SECRET = SECRET;
     }
     

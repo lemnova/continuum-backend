@@ -70,4 +70,12 @@ public class UserService {
     public void delete(long id) {
         repository.deleteById(id);
     }
+    
+    public void activate(long id){
+        User userEntity = repository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        userEntity.setStatus(true);
+        repository.saveAndFlush(userEntity);
+    }
 }
