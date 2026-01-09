@@ -1,7 +1,6 @@
-package tech.lemnova.continuum_backend.repositories;
+package tech.lemnova.continuum_backend.user;
 
 import jakarta.transaction.Transactional;
-import tech.lemnova.continuum_backend.entities.User;
 
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

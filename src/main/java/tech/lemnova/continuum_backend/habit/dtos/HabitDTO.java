@@ -1,7 +1,7 @@
-package tech.lemnova.continuum_backend.dtos.habit;
+package tech.lemnova.continuum_backend.habit.dtos;
 
 import java.time.Instant;
-import tech.lemnova.continuum_backend.entities.Habit;
+import tech.lemnova.continuum_backend.habit.Habit;
 
 public record HabitDTO(
     Long id,

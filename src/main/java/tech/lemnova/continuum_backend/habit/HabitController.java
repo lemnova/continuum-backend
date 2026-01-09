@@ -1,10 +1,11 @@
-package tech.lemnova.continuum_backend.controllers;
+package tech.lemnova.continuum_backend.habit;
 
+import tech.lemnova.continuum_backend.habit.dtos.HabitUpdateDTO;
+import tech.lemnova.continuum_backend.habit.dtos.HabitDTO;
+import tech.lemnova.continuum_backend.habit.dtos.HabitCreateDTO;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tech.lemnova.continuum_backend.dtos.habit.*;
-import tech.lemnova.continuum_backend.services.HabitService;
 
 @RestController
 @RequestMapping("/users/{userId}/habits")

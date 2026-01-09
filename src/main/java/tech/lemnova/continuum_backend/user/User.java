@@ -1,8 +1,9 @@
-package tech.lemnova.continuum_backend.entities;
+package tech.lemnova.continuum_backend.user;
 
 import jakarta.persistence.*;
 import java.util.List;
 import lombok.*;
+import tech.lemnova.continuum_backend.habit.Habit;
 
 @Getter
 @Setter
@@ -25,7 +26,14 @@ public class User {
     @Column(nullable = false)
     private String password;
     
-    private Boolean status = false; 
+    @Column(nullable = false)
+    private String role = "User";
+    
+    @Column(nullable = false)
+    private String emailVerified;
+    
+    @Column(nullable = false)
+    private Boolean isActive = false;
 
     @OneToMany(
         mappedBy = "user",

@@ -1,5 +1,6 @@
-package tech.lemnova.continuum_backend.entities;
+package tech.lemnova.continuum_backend.habit;
 
+import tech.lemnova.continuum_backend.user.User;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.time.LocalDate;

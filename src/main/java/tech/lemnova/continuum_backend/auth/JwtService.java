@@ -1,4 +1,4 @@
-package tech.lemnova.continuum_backend.services.auth;
+package tech.lemnova.continuum_backend.auth;
 
 import io.jsonwebtoken.Jwts;
 //import io.jsonwebtoken.SignatureAlgorithm;
@@ -6,7 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import tech.lemnova.continuum_backend.entities.User;
+import tech.lemnova.continuum_backend.user.User;
 
 @Service
 public class JwtService {

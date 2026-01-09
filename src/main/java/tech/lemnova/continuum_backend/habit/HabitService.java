@@ -1,13 +1,13 @@
-package tech.lemnova.continuum_backend.services;
+package tech.lemnova.continuum_backend.habit;
 
+import tech.lemnova.continuum_backend.user.User;
+import tech.lemnova.continuum_backend.user.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
-import tech.lemnova.continuum_backend.dtos.habit.HabitUpdateDTO;
-import tech.lemnova.continuum_backend.dtos.habit.HabitDTO;
-import tech.lemnova.continuum_backend.dtos.habit.HabitCreateDTO;
+import tech.lemnova.continuum_backend.habit.dtos.HabitUpdateDTO;
+import tech.lemnova.continuum_backend.habit.dtos.HabitDTO;
+import tech.lemnova.continuum_backend.habit.dtos.HabitCreateDTO;
 import org.springframework.stereotype.Service;
-import tech.lemnova.continuum_backend.entities.*;
-import tech.lemnova.continuum_backend.repositories.*;
 
 @Service
 public class HabitService {

@@ -12,4 +12,19 @@ spring.h2.console.enabled=true
 spring.h2.console.path=/h2-console
 spring.h2.console.settings.web-allow-others=true
 
-SECRET=secret-key-test-super-hyper-mega-secret-3000-11-generation-hard-tech
+/// -- JWT -- ///
+JWT_SECRET=secret-key-test-super-hyper-mega-secret-3000-11-generation-hard-tech
+
+
+/// -- EMAIL CLIENT -- ///
+// EMAIL SENDER 
+EMAIL_USER=
+
+// EMAIL PASSWD KEY
+EMAIL_PASS=
+
+//SMTP SERVER EMAIL
+SMTP_HOST=
+
+// SMTP port
+SMTP_PORT=

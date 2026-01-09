@@ -1,4 +1,4 @@
-package tech.lemnova.continuum_backend.dtos.habit;
+package tech.lemnova.continuum_backend.habit.dtos;
 
 import java.time.LocalDate;
 

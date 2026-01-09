@@ -1,4 +1,4 @@
-package tech.lemnova.continuum_backend.dtos.auth;
+package tech.lemnova.continuum_backend.auth.dtos;
 
 public record LoginDTO(
     String email,

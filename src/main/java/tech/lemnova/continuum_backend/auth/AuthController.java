@@ -1,13 +1,12 @@
-package tech.lemnova.continuum_backend.controllers;
+package tech.lemnova.continuum_backend.auth;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tech.lemnova.continuum_backend.dtos.auth.AuthResponseDTO;
-import tech.lemnova.continuum_backend.dtos.auth.LoginDTO;
-import tech.lemnova.continuum_backend.entities.User;
-import tech.lemnova.continuum_backend.services.auth.AuthService;
-import tech.lemnova.continuum_backend.services.UserService;
-import tech.lemnova.continuum_backend.services.auth.ValEmailService;
+import tech.lemnova.continuum_backend.auth.dtos.AuthResponseDTO;
+import tech.lemnova.continuum_backend.auth.dtos.LoginDTO;
+import tech.lemnova.continuum_backend.user.User;
+import tech.lemnova.continuum_backend.user.UserService;
+import tech.lemnova.continuum_backend.oldScheme.services.auth.ValEmailService;
 
 @RestController
 @RequestMapping("/auth")
@@ -16,16 +15,16 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserService userService;
-    //private final ValEmailService valEmailService;
+    private final ValEmailService valEmailService;
 
     public AuthController(
         AuthService authService,
-        UserService userService
-        //ValEmailService valEmailService
+        UserService userService,
+        ValEmailService valEmailService
     ) {
         this.authService = authService;
         this.userService = userService;
-        //this.valEmailService = valEmailService;
+        this.valEmailService = valEmailService;
     }
 
     @PostMapping("/login")
@@ -41,7 +40,8 @@ public class AuthController {
     public ResponseEntity<String> register(
         @RequestBody User user
     ) {
-        //valEmailService.sendValEmail(user.getEmail());
+        valEmailService.sendValEmail(user.getEmail());
+        // dps valida se o codigo foi correto se sim cria o usuario com isActive = true
         return ResponseEntity.ok(
             userService.create(user)
         );
