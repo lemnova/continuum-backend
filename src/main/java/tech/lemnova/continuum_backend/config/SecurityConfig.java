@@ -36,7 +36,6 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // uncommet this line for active the lovable tests
         config.setAllowedOrigins(List.of("http://localhost:5173","https://ln-continuum.lovable.app", "https://continuum-frontend.onrender.com"));
         config.setAllowedMethods(
             List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
