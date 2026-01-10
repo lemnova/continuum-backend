@@ -40,8 +40,8 @@ public class Habit {
     private User user;
 
     @Column(columnDefinition = "TEXT")
-    private String metadataJson; // Dados extras do hábito em JSON
+    private String metadataJson; // Dados extras do hábito em JSON como descricao etc
 
     @Column(columnDefinition = "TEXT")
-    private String progressJson; // Progresso do hábito em JSON
+    private String progressJson; // Progresso do hábito em JSON dias em que o habit foi realizado!
 }
