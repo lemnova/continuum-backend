@@ -1,66 +1,46 @@
 package tech.lemnova.continuum_backend.auth.emailToken;
 
-import jakarta.mail.*;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.SendEmailRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Properties;
-
+@Slf4j
 @Service
 public class EmailService {
 
-    @Value("${spring.mail.host}")
-    private String smtpHost;
+    private final Resend resend;
 
-    @Value("${spring.mail.port}")
-    private int smtpPort;
-
-    @Value("${spring.mail.username}")
+    @Value("${email.from}")
     private String fromEmail;
-
-    @Value("${spring.mail.password}")
-    private String password;
 
     @Value("${app.backend.url}")
     private String backendUrl;
+
+    public EmailService(@Value("${resend.api.key}") String apiKey) {
+        this.resend = new Resend(apiKey);
+    }
 
     public void sendVerificationEmail(String email, String token) {
 
         String link = backendUrl + "/auth/verify?token=" + token;
 
-        Properties props = new Properties();
-        props.put("mail.smtp.host", smtpHost);
-        props.put("mail.smtp.port", String.valueOf(smtpPort));
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-
-        Session session = Session.getInstance(
-            props,
-            new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(fromEmail, password);
-                }
-            }
-        );
+        SendEmailRequest request = SendEmailRequest.builder()
+                .from(fromEmail)
+                .to(email)
+                .subject("Verify your email")
+                .html(buildHtml(link))
+                .build();
 
         try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(fromEmail));
-            message.setRecipients(
-                Message.RecipientType.TO,
-                InternetAddress.parse(email)
-            );
-            message.setSubject("Verify your email");
+            resend.emails().send(request);
+            log.info("Verification email sent to {}", email);
 
-            message.setContent(buildHtml(link), "text/html; charset=utf-8");
-
-            Transport.send(message);
-
-        } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send verification email", e);
+        } catch (ResendException e) {
+            log.error("Failed to send verification email to {}", email, e);
+            throw new IllegalStateException("Email service unavailable");
         }
     }
 
