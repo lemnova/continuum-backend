@@ -30,10 +30,7 @@ public class User {
     private String role = "User";
     
     @Column(nullable = false)
-    private String emailVerified;
-    
-    @Column(nullable = false)
-    private Boolean isActive = false;
+    private Boolean active = false;
 
     @OneToMany(
         mappedBy = "user",
