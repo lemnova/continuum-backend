@@ -24,10 +24,10 @@ public class Habit {
     private Long id;
 
     private String name;
-
-    private LocalDate initDate;  // Data inicial do hábito
     
     private Boolean isActive = true;
+
+    private Boolean completedToday;
 
     @CreationTimestamp
     private Instant createdAt;

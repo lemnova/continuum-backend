@@ -44,7 +44,6 @@ public class HabitService {
 
         Habit habit = new Habit();
         habit.setName(dto.name);
-        habit.setInitDate(dto.initDate);
         habit.setMetadataJson(dto.metadataJson);
         habit.setProgressJson("{}");
         habit.setIsActive(true);
