@@ -1,14 +1,19 @@
 package tech.lemnova.continuum_backend.habit;
 
-import tech.lemnova.continuum_backend.habit.dtos.HabitUpdateDTO;
-import tech.lemnova.continuum_backend.habit.dtos.HabitDTO;
-import tech.lemnova.continuum_backend.habit.dtos.HabitCreateDTO;
+import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tech.lemnova.continuum_backend.habit.dtos.HabitCreateDTO;
+import tech.lemnova.continuum_backend.habit.dtos.HabitDTO;
+import tech.lemnova.continuum_backend.habit.dtos.HabitUpdateDTO;
+import tech.lemnova.continuum_backend.habit.dtos.ProgressUpdateDTO;
 
 @RestController
-@RequestMapping("/users/{userId}/habits")
+@RequestMapping("/api/habits")
 public class HabitController {
 
     private final HabitService habitService;
@@ -17,54 +22,73 @@ public class HabitController {
         this.habitService = habitService;
     }
 
-    // CREATE
-    @PostMapping
-    public ResponseEntity<HabitDTO> create(
+    // GET /api/habits/user/{userId} (com paginação opcional)
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<HabitDTO>> listByUser(
         @PathVariable Long userId,
-        @RequestBody HabitCreateDTO dto
+        Pageable pageable
     ) {
-        return ResponseEntity.ok(
-            habitService.create(userId, dto)
-        );
+        Page<HabitDTO> habits = habitService.listByUser(userId, pageable);
+        return ResponseEntity.ok(habits);
     }
 
-    // LIST ALL (by user)
-    @GetMapping
-    public ResponseEntity<List<HabitDTO>> list(
+    // GET /api/habits/user/{userId}/all (sem paginação)
+    @GetMapping("/user/{userId}/all")
+    public ResponseEntity<List<HabitDTO>> listAllByUser(
         @PathVariable Long userId
     ) {
-        return ResponseEntity.ok(
-            habitService.listByUser(userId)
-        );
+        List<HabitDTO> habits = habitService.listByUser(userId);
+        return ResponseEntity.ok(habits);
     }
 
-    // READ (single habit)
-    @GetMapping("/{habitId}")
-    public ResponseEntity<HabitDTO> read(
-        @PathVariable Long habitId
+    // POST /api/habits/user/{userId}
+    @PostMapping("/user/{userId}")
+    public ResponseEntity<HabitDTO> create(
+        @PathVariable Long userId,
+        @Valid @RequestBody HabitCreateDTO dto
     ) {
-        return ResponseEntity.ok(
-            habitService.read(habitId)
-        );
+        HabitDTO created = habitService.create(userId, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    // UPDATE
-    @PutMapping("/{habitId}")
+    // GET /api/habits/{id}
+    @GetMapping("/{id}")
+    public ResponseEntity<HabitDTO> read(@PathVariable Long id) {
+        HabitDTO habit = habitService.read(id);
+        return ResponseEntity.ok(habit);
+    }
+
+    // PUT /api/habits/{id}
+    @PutMapping("/{id}")
     public ResponseEntity<HabitDTO> update(
-        @PathVariable Long habitId,
-        @RequestBody HabitUpdateDTO dto
+        @PathVariable Long id,
+        @Valid @RequestBody HabitUpdateDTO dto
     ) {
-        return ResponseEntity.ok(
-            habitService.update(habitId, dto)
-        );
+        HabitDTO updated = habitService.update(id, dto);
+        return ResponseEntity.ok(updated);
     }
 
-    // DELETE
-    @DeleteMapping("/{habitId}")
-    public ResponseEntity<Void> delete(
-        @PathVariable Long habitId
-    ) {
-        habitService.delete(habitId);
+    // DELETE /api/habits/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        habitService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // POST /api/habits/{id}/progress
+    @PostMapping("/{id}/progress")
+    public ResponseEntity<Void> updateProgress(
+        @PathVariable Long id,
+        @Valid @RequestBody ProgressUpdateDTO dto
+    ) {
+        habitService.updateProgress(id, dto);
+        return ResponseEntity.ok().build();
+    }
+
+    // GET /api/habits/{id}/streak
+    @GetMapping("/{id}/streak")
+    public ResponseEntity<Integer> getCurrentStreak(@PathVariable Long id) {
+        Integer streak = habitService.calculateCurrentStreak(id);
+        return ResponseEntity.ok(streak);
     }
 }

@@ -1,15 +1,17 @@
 package tech.lemnova.continuum_backend.habit;
 
-import tech.lemnova.continuum_backend.user.User;
 import jakarta.persistence.*;
 import java.time.Instant;
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import tech.lemnova.continuum_backend.progress.DailyProgress;
+import tech.lemnova.continuum_backend.user.User;
 
 @Getter
 @Setter
@@ -23,11 +25,19 @@ public class Habit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
-    
-    private Boolean isActive = true;
 
-    private Boolean completedToday;
+    private String description;
+
+    private String category;
+
+    private String icon;
+
+    private String color;
+
+    @Column(nullable = false)
+    private Boolean isActive = true;
 
     @CreationTimestamp
     private Instant createdAt;
@@ -35,13 +45,17 @@ public class Habit {
     @UpdateTimestamp
     private Instant updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(columnDefinition = "TEXT")
-    private String metadataJson; // Dados extras do hábito em JSON como descricao etc
+    @OneToMany(
+        mappedBy = "habit",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<DailyProgress> dailyProgress = new ArrayList<>();
 
-    @Column(columnDefinition = "TEXT")
-    private String progressJson; // Progresso do hábito em JSON dias em que o habit foi realizado!
+    // Campo para soft delete (opcional)
+    private Boolean deleted = false;
 }
