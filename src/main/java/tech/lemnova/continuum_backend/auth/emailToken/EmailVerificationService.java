@@ -1,59 +1,62 @@
 package tech.lemnova.continuum_backend.auth.emailToken;
 
-import org.springframework.stereotype.Service;
-import tech.lemnova.continuum_backend.user.User;
-import tech.lemnova.continuum_backend.user.UserService;
-
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tech.lemnova.continuum_backend.user.User;
+import tech.lemnova.continuum_backend.user.UserRepository;
 
 @Service
 public class EmailVerificationService {
 
     private final EmailVerificationTokenRepository tokenRepository;
+    private final UserRepository userRepository;
     private final EmailService emailService;
-    private final UserService userService;
 
     public EmailVerificationService(
         EmailVerificationTokenRepository tokenRepository,
-        EmailService emailService,
-        UserService userService
+        UserRepository userRepository,
+        EmailService emailService
     ) {
         this.tokenRepository = tokenRepository;
+        this.userRepository = userRepository;
         this.emailService = emailService;
-        this.userService = userService;
     }
 
-    public void createAndSend(User user) {
+    @Transactional
+    public void createAndSendVerificationToken(User user) {
+        String tokenValue = UUID.randomUUID().toString();
+
         EmailVerificationToken token = new EmailVerificationToken();
-        token.setToken(UUID.randomUUID().toString());
-        token.setUser(user);
-        token.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+        token.setToken(tokenValue);
+        token.setUserId(user.getId());
+        token.setExpiresAt(Instant.now().plusSeconds(86400)); // 24 horas
+        token.setCreatedAt(Instant.now());
 
         tokenRepository.save(token);
-        emailService.sendVerificationEmail(
-            user.getEmail(),
-            token.getToken()
-        );
+        emailService.sendVerificationEmail(user.getEmail(), tokenValue);
     }
 
-    public void verify(String tokenValue) {
+    @Transactional
+    public void verifyToken(String tokenValue) {
         EmailVerificationToken token = tokenRepository
             .findByToken(tokenValue)
-            .orElseThrow(() -> new RuntimeException("Invalid token"));
+            .orElseThrow(() ->
+                new RuntimeException("Invalid verification token")
+            );
 
-        if (token.isUsed()) {
-            throw new RuntimeException("Token already used");
+        if (token.getExpiresAt().isBefore(Instant.now())) {
+            throw new RuntimeException("Verification token has expired");
         }
 
-        if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Token expired");
-        }
+        User user = userRepository
+            .findById(token.getUserId())
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        User user = token.getUser();
-        userService.activate(user.getId());
+        user.setActive(true);
+        userRepository.save(user);
 
-        token.setUsed(true);
         tokenRepository.delete(token);
     }
 }

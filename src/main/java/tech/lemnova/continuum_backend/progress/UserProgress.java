@@ -15,7 +15,5 @@ public class UserProgress {
     date: 2026/01/13,
     score: 5
     }
-    
-    
     */
 }

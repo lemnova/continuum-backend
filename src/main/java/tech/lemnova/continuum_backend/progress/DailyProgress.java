@@ -1,53 +1,45 @@
 package tech.lemnova.continuum_backend.progress;
 
-import jakarta.persistence.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import tech.lemnova.continuum_backend.habit.Habit;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(
-    name = "daily_progress",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "habit_id", "date" }),
-    },
-    indexes = {
-        @Index(name = "idx_habit_date", columnList = "habit_id, date"),
-        @Index(name = "idx_date", columnList = "date"),
-    }
+@Document(collection = "daily_progress")
+@CompoundIndex(
+    name = "habit_date_idx",
+    def = "{'habitId': 1, 'date': 1}",
+    unique = true
 )
 public class DailyProgress {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "habit_id", nullable = false)
-    private Habit habit;
+    @Indexed
+    private String habitId;
 
-    @Column(nullable = false)
+    @Indexed
+    private String userId;
+
+    @Indexed
     private LocalDate date;
 
-    @Column(nullable = false)
     private Boolean completed = false;
 
-    @Column(length = 500)
     private String notes;
 
-    @CreationTimestamp
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
-    @UpdateTimestamp
-    private Instant updatedAt;
+    private Instant updatedAt = Instant.now();
 }

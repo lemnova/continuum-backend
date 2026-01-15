@@ -1,31 +1,24 @@
 package tech.lemnova.continuum_backend.habit;
 
-import jakarta.persistence.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import tech.lemnova.continuum_backend.progress.DailyProgress;
-import tech.lemnova.continuum_backend.user.User;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "habits")
+@Document(collection = "habits")
 public class Habit {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(nullable = false)
     private String name;
 
     private String description;
@@ -36,26 +29,14 @@ public class Habit {
 
     private String color;
 
-    @Column(nullable = false)
     private Boolean isActive = true;
 
-    @CreationTimestamp
-    private Instant createdAt;
+    @Indexed
+    private String userId;
 
-    @UpdateTimestamp
-    private Instant updatedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @OneToMany(
-        mappedBy = "habit",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
-    private List<DailyProgress> dailyProgress = new ArrayList<>();
-
-    // Campo para soft delete (opcional)
     private Boolean deleted = false;
+
+    private Instant createdAt = Instant.now();
+
+    private Instant updatedAt = Instant.now();
 }

@@ -1,5 +1,6 @@
 package tech.lemnova.continuum_backend.progress;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,12 +26,14 @@ public class DailyProgressService {
 
     // GET PROGRESS FOR HABIT
     public List<DailyProgressDTO> getProgressForHabit(
-        Long habitId,
+        String habitId,
         LocalDate startDate,
         LocalDate endDate
     ) {
         if (!habitRepository.existsById(habitId)) {
-            throw new ResourceNotFoundException("Habit", habitId);
+            throw new ResourceNotFoundException(
+                "Habit not found with id: " + habitId
+            );
         }
 
         return dailyProgressRepository
@@ -42,7 +45,7 @@ public class DailyProgressService {
 
     // GET PROGRESS FOR USER (para heatmap geral)
     public List<DailyProgressDTO> getProgressForUser(
-        Long userId,
+        String userId,
         LocalDate startDate,
         LocalDate endDate
     ) {
@@ -54,7 +57,7 @@ public class DailyProgressService {
     }
 
     // GET TODAY'S PROGRESS FOR USER
-    public List<DailyProgressDTO> getTodayProgressForUser(Long userId) {
+    public List<DailyProgressDTO> getTodayProgressForUser(String userId) {
         LocalDate today = LocalDate.now();
         return dailyProgressRepository
             .findByUserIdAndDate(userId, today)
@@ -65,10 +68,14 @@ public class DailyProgressService {
 
     // TOGGLE PROGRESS (marcar/desmarcar)
     @Transactional
-    public DailyProgressDTO toggleProgress(Long habitId, LocalDate date) {
+    public DailyProgressDTO toggleProgress(String habitId, LocalDate date) {
         Habit habit = habitRepository
             .findById(habitId)
-            .orElseThrow(() -> new ResourceNotFoundException("Habit", habitId));
+            .orElseThrow(() ->
+                new ResourceNotFoundException(
+                    "Habit not found with id: " + habitId
+                )
+            );
 
         DailyProgress progress = dailyProgressRepository
             .findByHabitIdAndDate(habitId, date)
@@ -76,20 +83,23 @@ public class DailyProgressService {
 
         if (progress.getId() == null) {
             // Criar novo registro
-            progress.setHabit(habit);
+            progress.setHabitId(habit.getId());
+            progress.setUserId(habit.getUserId());
             progress.setDate(date);
             progress.setCompleted(true);
+            progress.setCreatedAt(Instant.now());
         } else {
             // Toggle
             progress.setCompleted(!progress.getCompleted());
         }
 
+        progress.setUpdatedAt(Instant.now());
         DailyProgress saved = dailyProgressRepository.save(progress);
         return DailyProgressDTO.from(saved);
     }
 
     // CALCULATE DAILY SCORE FOR USER
-    public Integer calculateDailyScore(Long userId, LocalDate date) {
+    public Integer calculateDailyScore(String userId, LocalDate date) {
         List<DailyProgress> progressList =
             dailyProgressRepository.findByUserIdAndDate(userId, date);
 

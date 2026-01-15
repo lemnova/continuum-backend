@@ -1,5 +1,6 @@
 package tech.lemnova.continuum_backend.habit;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,9 +36,11 @@ public class HabitService {
     }
 
     // LIST BY USER (com paginação)
-    public Page<HabitDTO> listByUser(Long userId, Pageable pageable) {
+    public Page<HabitDTO> listByUser(String userId, Pageable pageable) {
         if (!userRepository.existsById(userId)) {
-            throw new ResourceNotFoundException("User", userId);
+            throw new ResourceNotFoundException(
+                "User not found with id: " + userId
+            );
         }
 
         return habitRepository
@@ -52,9 +55,11 @@ public class HabitService {
     }
 
     // LIST BY USER (sem paginação)
-    public List<HabitDTO> listByUser(Long userId) {
+    public List<HabitDTO> listByUser(String userId) {
         if (!userRepository.existsById(userId)) {
-            throw new ResourceNotFoundException("User", userId);
+            throw new ResourceNotFoundException(
+                "User not found with id: " + userId
+            );
         }
 
         return habitRepository
@@ -72,10 +77,14 @@ public class HabitService {
 
     // CREATE
     @Transactional
-    public HabitDTO create(Long userId, HabitCreateDTO dto) {
+    public HabitDTO create(String userId, HabitCreateDTO dto) {
         User user = userRepository
             .findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("User", userId));
+            .orElseThrow(() ->
+                new ResourceNotFoundException(
+                    "User not found with id: " + userId
+                )
+            );
 
         Habit habit = new Habit();
         habit.setName(dto.name());
@@ -85,17 +94,21 @@ public class HabitService {
         habit.setColor(dto.color());
         habit.setIsActive(true);
         habit.setDeleted(false);
-        habit.setUser(user);
+        habit.setUserId(user.getId());
+        habit.setCreatedAt(Instant.now());
+        habit.setUpdatedAt(Instant.now());
 
         Habit saved = habitRepository.save(habit);
         return HabitDTO.from(saved, 0, 0L);
     }
 
     // READ
-    public HabitDTO read(Long id) {
+    public HabitDTO read(String id) {
         Habit habit = habitRepository
             .findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Habit", id));
+            .orElseThrow(() ->
+                new ResourceNotFoundException("Habit not found with id: " + id)
+            );
 
         Integer streak = calculateCurrentStreak(id);
         Long total = dailyProgressRepository.countCompletedByHabitId(id);
@@ -105,10 +118,12 @@ public class HabitService {
 
     // UPDATE
     @Transactional
-    public HabitDTO update(Long id, HabitUpdateDTO dto) {
+    public HabitDTO update(String id, HabitUpdateDTO dto) {
         Habit habit = habitRepository
             .findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Habit", id));
+            .orElseThrow(() ->
+                new ResourceNotFoundException("Habit not found with id: " + id)
+            );
 
         if (dto.name() != null) {
             habit.setName(dto.name());
@@ -134,7 +149,8 @@ public class HabitService {
             habit.setIsActive(dto.isActive());
         }
 
-        Habit updated = habitRepository.saveAndFlush(habit);
+        habit.setUpdatedAt(Instant.now());
+        Habit updated = habitRepository.save(habit);
 
         Integer streak = calculateCurrentStreak(id);
         Long total = dailyProgressRepository.countCompletedByHabitId(id);
@@ -144,36 +160,49 @@ public class HabitService {
 
     // DELETE (soft delete)
     @Transactional
-    public void delete(Long id) {
+    public void delete(String id) {
         Habit habit = habitRepository
             .findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Habit", id));
+            .orElseThrow(() ->
+                new ResourceNotFoundException("Habit not found with id: " + id)
+            );
 
         habit.setDeleted(true);
+        habit.setUpdatedAt(Instant.now());
         habitRepository.save(habit);
     }
 
     // UPDATE PROGRESS
     @Transactional
-    public void updateProgress(Long habitId, ProgressUpdateDTO dto) {
+    public void updateProgress(String habitId, ProgressUpdateDTO dto) {
         Habit habit = habitRepository
             .findById(habitId)
-            .orElseThrow(() -> new ResourceNotFoundException("Habit", habitId));
+            .orElseThrow(() ->
+                new ResourceNotFoundException(
+                    "Habit not found with id: " + habitId
+                )
+            );
 
         DailyProgress progress = dailyProgressRepository
             .findByHabitIdAndDate(habitId, dto.date())
             .orElse(new DailyProgress());
 
-        progress.setHabit(habit);
+        progress.setHabitId(habit.getId());
+        progress.setUserId(habit.getUserId());
         progress.setDate(dto.date());
         progress.setCompleted(dto.completed());
         progress.setNotes(dto.notes());
+
+        if (progress.getId() == null) {
+            progress.setCreatedAt(Instant.now());
+        }
+        progress.setUpdatedAt(Instant.now());
 
         dailyProgressRepository.save(progress);
     }
 
     // CALCULATE CURRENT STREAK
-    public Integer calculateCurrentStreak(Long habitId) {
+    public Integer calculateCurrentStreak(String habitId) {
         LocalDate today = LocalDate.now();
         LocalDate checkDate = today;
         int streak = 0;
@@ -214,12 +243,14 @@ public class HabitService {
 
     // GET PROGRESS FOR DATE RANGE
     public List<DailyProgress> getProgressForDateRange(
-        Long habitId,
+        String habitId,
         LocalDate startDate,
         LocalDate endDate
     ) {
         if (!habitRepository.existsById(habitId)) {
-            throw new ResourceNotFoundException("Habit", habitId);
+            throw new ResourceNotFoundException(
+                "Habit not found with id: " + habitId
+            );
         }
 
         return dailyProgressRepository.findByHabitIdAndDateBetween(

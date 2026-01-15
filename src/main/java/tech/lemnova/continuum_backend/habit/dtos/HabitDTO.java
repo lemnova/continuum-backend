@@ -4,7 +4,7 @@ import java.time.Instant;
 import tech.lemnova.continuum_backend.habit.Habit;
 
 public record HabitDTO(
-    Long id,
+    String id,
     String name,
     String description,
     String category,
@@ -13,7 +13,7 @@ public record HabitDTO(
     Boolean isActive,
     Instant createdAt,
     Instant updatedAt,
-    Long userId,
+    String userId,
     Integer currentStreak,
     Long totalCompletions
 ) {
@@ -28,9 +28,9 @@ public record HabitDTO(
             habit.getIsActive(),
             habit.getCreatedAt(),
             habit.getUpdatedAt(),
-            habit.getUser().getId(),
-            null, // Será calculado no service
-            null // Será calculado no service
+            habit.getUserId(),
+            null,
+            null
         );
     }
 
@@ -49,7 +49,7 @@ public record HabitDTO(
             habit.getIsActive(),
             habit.getCreatedAt(),
             habit.getUpdatedAt(),
-            habit.getUser().getId(),
+            habit.getUserId(),
             currentStreak,
             totalCompletions
         );

@@ -1,32 +1,32 @@
 package tech.lemnova.continuum_backend.auth.emailToken;
 
-import jakarta.persistence.*;
+import java.time.Instant;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import tech.lemnova.continuum_backend.user.User;
-
-import java.time.LocalDateTime;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "email_verification_tokens")
+@NoArgsConstructor
+@AllArgsConstructor
+@Document(collection = "email_verification_tokens")
 public class EmailVerificationToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(nullable = false, unique = true)
+    @Indexed(unique = true)
     private String token;
 
-    @OneToOne(optional = false)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Indexed
+    private String userId;
 
-    @Column(nullable = false)
-    private LocalDateTime expiresAt;
+    // TTL index será criado via application properties ou configuration class
+    private Instant expiresAt;
 
-    @Column(nullable = false)
-    private boolean used = false;
+    private Instant createdAt = Instant.now();
 }

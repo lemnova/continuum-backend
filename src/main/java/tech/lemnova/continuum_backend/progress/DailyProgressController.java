@@ -1,6 +1,5 @@
 package tech.lemnova.continuum_backend.progress;
 
-import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,7 +19,7 @@ public class DailyProgressController {
     // GET /api/progress/habit/{habitId}?startDate=2024-01-01&endDate=2024-12-31
     @GetMapping("/habit/{habitId}")
     public ResponseEntity<List<DailyProgressDTO>> getProgressForHabit(
-        @PathVariable Long habitId,
+        @PathVariable String habitId,
         @RequestParam @DateTimeFormat(
             iso = DateTimeFormat.ISO.DATE
         ) LocalDate startDate,
@@ -40,7 +39,7 @@ public class DailyProgressController {
     // GET /api/progress/user/{userId}?startDate=2024-01-01&endDate=2024-12-31
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<DailyProgressDTO>> getProgressForUser(
-        @PathVariable Long userId,
+        @PathVariable String userId,
         @RequestParam @DateTimeFormat(
             iso = DateTimeFormat.ISO.DATE
         ) LocalDate startDate,
@@ -56,7 +55,7 @@ public class DailyProgressController {
     // GET /api/progress/user/{userId}/today
     @GetMapping("/user/{userId}/today")
     public ResponseEntity<List<DailyProgressDTO>> getTodayProgress(
-        @PathVariable Long userId
+        @PathVariable String userId
     ) {
         List<DailyProgressDTO> progress =
             dailyProgressService.getTodayProgressForUser(userId);
@@ -66,7 +65,7 @@ public class DailyProgressController {
     // POST /api/progress/habit/{habitId}/toggle?date=2024-01-15
     @PostMapping("/habit/{habitId}/toggle")
     public ResponseEntity<DailyProgressDTO> toggleProgress(
-        @PathVariable Long habitId,
+        @PathVariable String habitId,
         @RequestParam @DateTimeFormat(
             iso = DateTimeFormat.ISO.DATE
         ) LocalDate date
@@ -81,7 +80,7 @@ public class DailyProgressController {
     // GET /api/progress/user/{userId}/score?date=2024-01-15
     @GetMapping("/user/{userId}/score")
     public ResponseEntity<Integer> getDailyScore(
-        @PathVariable Long userId,
+        @PathVariable String userId,
         @RequestParam(required = false) @DateTimeFormat(
             iso = DateTimeFormat.ISO.DATE
         ) LocalDate date

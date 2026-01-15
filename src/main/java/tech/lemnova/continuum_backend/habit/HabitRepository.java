@@ -3,31 +3,26 @@ package tech.lemnova.continuum_backend.habit;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface HabitRepository extends JpaRepository<Habit, Long> {
-    List<Habit> findAllByUserId(Long userId);
+public interface HabitRepository extends MongoRepository<Habit, String> {
+    List<Habit> findAllByUserId(String userId);
 
-    Page<Habit> findAllByUserId(Long userId, Pageable pageable);
+    Page<Habit> findAllByUserId(String userId, Pageable pageable);
 
-    List<Habit> findAllByUserIdAndIsActiveTrue(Long userId);
+    List<Habit> findAllByUserIdAndIsActiveTrue(String userId);
 
-    Page<Habit> findAllByUserIdAndIsActiveTrue(Long userId, Pageable pageable);
-
-    @Query(
-        "SELECT h FROM Habit h WHERE h.user.id = :userId AND h.deleted = false"
-    )
-    List<Habit> findAllActiveByUserId(@Param("userId") Long userId);
-
-    @Query(
-        "SELECT h FROM Habit h WHERE h.user.id = :userId AND h.category = :category AND h.deleted = false"
-    )
-    List<Habit> findAllByUserIdAndCategory(
-        @Param("userId") Long userId,
-        @Param("category") String category
+    Page<Habit> findAllByUserIdAndIsActiveTrue(
+        String userId,
+        Pageable pageable
     );
+
+    @Query("{'userId': ?0, 'deleted': false}")
+    List<Habit> findAllActiveByUserId(String userId);
+
+    @Query("{'userId': ?0, 'category': ?1, 'deleted': false}")
+    List<Habit> findAllByUserIdAndCategory(String userId, String category);
 }

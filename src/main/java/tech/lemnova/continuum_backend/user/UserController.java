@@ -1,40 +1,36 @@
 package tech.lemnova.continuum_backend.user;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tech.lemnova.continuum_backend.user.dtos.UserDTO;
 
 @RestController
-@RequestMapping("/user")
-@RequiredArgsConstructor
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
 
-    @GetMapping
-    public ResponseEntity<UserDTO> read(@RequestParam long id) {
-        return ResponseEntity.ok(userService.read(id));
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @PutMapping
-    public ResponseEntity<String> update(
-        @RequestParam long id,
-        @RequestBody User user
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable String id) {
+        UserDTO user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity<UserDTO> getUserByUsername(
+        @PathVariable String username
     ) {
-        String response = userService.update(id, user);
-        return ResponseEntity.ok(response);
+        UserDTO user = userService.getUserByUsername(username);
+        return ResponseEntity.ok(user);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> delete(@RequestParam long id) {
-        userService.delete(id);
-        return ResponseEntity.ok().build();
+    @GetMapping("/email/{email}")
+    public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) {
+        UserDTO user = userService.getUserByEmail(email);
+        return ResponseEntity.ok(user);
     }
 }

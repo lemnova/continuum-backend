@@ -25,7 +25,7 @@ public class HabitController {
     // GET /api/habits/user/{userId} (com paginação opcional)
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<HabitDTO>> listByUser(
-        @PathVariable Long userId,
+        @PathVariable String userId,
         Pageable pageable
     ) {
         Page<HabitDTO> habits = habitService.listByUser(userId, pageable);
@@ -35,7 +35,7 @@ public class HabitController {
     // GET /api/habits/user/{userId}/all (sem paginação)
     @GetMapping("/user/{userId}/all")
     public ResponseEntity<List<HabitDTO>> listAllByUser(
-        @PathVariable Long userId
+        @PathVariable String userId
     ) {
         List<HabitDTO> habits = habitService.listByUser(userId);
         return ResponseEntity.ok(habits);
@@ -44,7 +44,7 @@ public class HabitController {
     // POST /api/habits/user/{userId}
     @PostMapping("/user/{userId}")
     public ResponseEntity<HabitDTO> create(
-        @PathVariable Long userId,
+        @PathVariable String userId,
         @Valid @RequestBody HabitCreateDTO dto
     ) {
         HabitDTO created = habitService.create(userId, dto);
@@ -53,7 +53,7 @@ public class HabitController {
 
     // GET /api/habits/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<HabitDTO> read(@PathVariable Long id) {
+    public ResponseEntity<HabitDTO> read(@PathVariable String id) {
         HabitDTO habit = habitService.read(id);
         return ResponseEntity.ok(habit);
     }
@@ -61,7 +61,7 @@ public class HabitController {
     // PUT /api/habits/{id}
     @PutMapping("/{id}")
     public ResponseEntity<HabitDTO> update(
-        @PathVariable Long id,
+        @PathVariable String id,
         @Valid @RequestBody HabitUpdateDTO dto
     ) {
         HabitDTO updated = habitService.update(id, dto);
@@ -70,7 +70,7 @@ public class HabitController {
 
     // DELETE /api/habits/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         habitService.delete(id);
         return ResponseEntity.noContent().build();
     }
@@ -78,7 +78,7 @@ public class HabitController {
     // POST /api/habits/{id}/progress
     @PostMapping("/{id}/progress")
     public ResponseEntity<Void> updateProgress(
-        @PathVariable Long id,
+        @PathVariable String id,
         @Valid @RequestBody ProgressUpdateDTO dto
     ) {
         habitService.updateProgress(id, dto);
@@ -87,7 +87,7 @@ public class HabitController {
 
     // GET /api/habits/{id}/streak
     @GetMapping("/{id}/streak")
-    public ResponseEntity<Integer> getCurrentStreak(@PathVariable Long id) {
+    public ResponseEntity<Integer> getCurrentStreak(@PathVariable String id) {
         Integer streak = habitService.calculateCurrentStreak(id);
         return ResponseEntity.ok(streak);
     }

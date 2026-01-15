@@ -4,9 +4,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 public record DailyProgressDTO(
-    Long id,
-    Long habitId,
-    String habitName,
+    String id,
+    String habitId,
+    String userId,
     LocalDate date,
     Boolean completed,
     String notes,
@@ -16,8 +16,8 @@ public record DailyProgressDTO(
     public static DailyProgressDTO from(DailyProgress progress) {
         return new DailyProgressDTO(
             progress.getId(),
-            progress.getHabit().getId(),
-            progress.getHabit().getName(),
+            progress.getHabitId(),
+            progress.getUserId(),
             progress.getDate(),
             progress.getCompleted(),
             progress.getNotes(),

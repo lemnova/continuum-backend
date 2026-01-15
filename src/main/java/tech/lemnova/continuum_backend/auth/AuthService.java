@@ -1,12 +1,13 @@
 package tech.lemnova.continuum_backend.auth;
 
+import java.time.Instant;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tech.lemnova.continuum_backend.auth.dtos.AuthResponseDTO;
+import tech.lemnova.continuum_backend.auth.dtos.LoginDTO;
 import tech.lemnova.continuum_backend.auth.emailToken.EmailVerificationService;
 import tech.lemnova.continuum_backend.user.User;
 import tech.lemnova.continuum_backend.user.UserRepository;
-import tech.lemnova.continuum_backend.user.dtos.UserDTO;
 
 @Service
 public class AuthService {
@@ -17,10 +18,10 @@ public class AuthService {
     private final EmailVerificationService emailVerificationService;
 
     public AuthService(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            JwtService jwtService,
-            EmailVerificationService emailVerificationService
+        UserRepository userRepository,
+        PasswordEncoder passwordEncoder,
+        JwtService jwtService,
+        EmailVerificationService emailVerificationService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -28,33 +29,74 @@ public class AuthService {
         this.emailVerificationService = emailVerificationService;
     }
 
-    public AuthResponseDTO login(String email, String password) {
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (!user.getActive()) {
-            throw new RuntimeException("Email not verified");
+    public AuthResponseDTO register(
+        String username,
+        String email,
+        String password
+    ) {
+        if (userRepository.existsByUsername(username)) {
+            throw new RuntimeException("Username already exists");
         }
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        if (userRepository.existsByEmail(email)) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole("USER");
+        user.setActive(false);
+        user.setCreatedAt(Instant.now());
+        user.setUpdatedAt(Instant.now());
+
+        User savedUser = userRepository.save(user);
+
+        emailVerificationService.createAndSendVerificationToken(savedUser);
+
+        String token = jwtService.generateToken(
+            savedUser.getId(),
+            savedUser.getUsername()
+        );
+
+        return new AuthResponseDTO(
+            token,
+            savedUser.getId(),
+            savedUser.getUsername(),
+            savedUser.getEmail()
+        );
+    }
+
+    public AuthResponseDTO login(LoginDTO dto) {
+        User user = userRepository
+            .findByEmail(dto.email())
+            .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+
+        if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 
-        String token = jwtService.generateToken(user);
-
-        return new AuthResponseDTO(token, UserDTO.from(user));
-    }
-
-    public void register(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already registered");
+        if (!user.getActive()) {
+            throw new RuntimeException(
+                "Please verify your email before logging in"
+            );
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setActive(false);
+        String token = jwtService.generateToken(
+            user.getId(),
+            user.getUsername()
+        );
 
-        User saved = userRepository.save(user);
-        emailVerificationService.createAndSend(saved);
+        return new AuthResponseDTO(
+            token,
+            user.getId(),
+            user.getUsername(),
+            user.getEmail()
+        );
+    }
+
+    public void verifyEmail(String token) {
+        emailVerificationService.verifyToken(token);
     }
 }

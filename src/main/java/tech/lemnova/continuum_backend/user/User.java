@@ -1,41 +1,34 @@
 package tech.lemnova.continuum_backend.user;
 
-import jakarta.persistence.*;
-import java.util.List;
 import lombok.*;
-import tech.lemnova.continuum_backend.habit.Habit;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import java.time.Instant;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "users")
+@Document(collection = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(nullable = false, unique = true)
+    @Indexed(unique = true)
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @Indexed(unique = true)
     private String email;
 
-    @Column(nullable = false)
     private String password;
-    
-    @Column(nullable = false)
-    private String role = "User";
-    
-    @Column(nullable = false)
+
+    private String role = "USER";
+
     private Boolean active = false;
 
-    @OneToMany(
-        mappedBy = "user",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
-    private List<Habit> Habits;
+    private Instant createdAt = Instant.now();
+
+    private Instant updatedAt = Instant.now();
 }

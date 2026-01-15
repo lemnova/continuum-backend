@@ -1,54 +1,52 @@
 package tech.lemnova.continuum_backend.auth;
 
-import org.springframework.http.HttpStatus;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tech.lemnova.continuum_backend.auth.dtos.AuthResponseDTO;
 import tech.lemnova.continuum_backend.auth.dtos.LoginDTO;
 import tech.lemnova.continuum_backend.auth.emailToken.EmailVerificationService;
-import tech.lemnova.continuum_backend.user.User;
-import tech.lemnova.continuum_backend.user.UserService;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final AuthService authService;
-    private final UserService userService;
     private final EmailVerificationService emailVerificationService;
 
     public AuthController(
         AuthService authService,
-        UserService userService,
         EmailVerificationService emailVerificationService
     ) {
         this.authService = authService;
-        this.userService = userService;
         this.emailVerificationService = emailVerificationService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-        authService.register(user);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("User registered. Check your email.");
+    public ResponseEntity<AuthResponseDTO> register(
+        @RequestBody Map<String, String> request
+    ) {
+        String username = request.get("username");
+        String email = request.get("email");
+        String password = request.get("password");
+
+        AuthResponseDTO response = authService.register(
+            username,
+            email,
+            password
+        );
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/verify")
-    public ResponseEntity<String> verifyEmail(
-        @RequestParam String token
-    ) {
-        emailVerificationService.verify(token);
+    @GetMapping("/verify-email")
+    public ResponseEntity<String> verifyEmail(@RequestParam String token) {
+        authService.verifyEmail(token);
         return ResponseEntity.ok("Email verified successfully");
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(
-        @RequestBody LoginDTO dto
-    ) {
-        return ResponseEntity.ok(
-            authService.login(dto.email(), dto.password())
-        );
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDTO dto) {
+        AuthResponseDTO response = authService.login(dto);
+        return ResponseEntity.ok(response);
     }
 }
