@@ -44,14 +44,24 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth ->
                 auth
-                    // 🔓 Endpoints públicos / infraestrutura
+                    // 🔓 Health check & infraestrutura
                     .requestMatchers(
                         "/health",
-                        "/auth/**",
-                        "/system/**",
+                        "/actuator/**",
+                        "/error"
+                    )
+                    .permitAll()
+                    // 🔓 Autenticação
+                    .requestMatchers("/auth/**", "/system/**")
+                    .permitAll()
+                    // 🔓 Swagger/OpenAPI - COMPLETO
+                    .requestMatchers(
                         "/swagger-ui/**",
+                        "/swagger-ui.html",
                         "/v3/api-docs/**",
-                        "/swagger-ui.html"
+                        "/v3/api-docs",
+                        "/swagger-resources/**",
+                        "/webjars/**"
                     )
                     .permitAll()
                     // 🔐 Todo o resto exige JWT
@@ -70,7 +80,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 🌐 CORS centralizado
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -97,7 +106,6 @@ public class SecurityConfig {
         return source;
     }
 
-    // 🔐 Auth Provider
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider =
@@ -109,7 +117,6 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    // 🧠 Auth Manager
     @Bean
     public AuthenticationManager authenticationManager(
         AuthenticationConfiguration config
@@ -117,7 +124,6 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    // 🔑 Password encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
