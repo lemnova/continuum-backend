@@ -16,28 +16,26 @@ public class EmailService {
     @Value("${email.from}")
     private String fromEmail;
 
-    @Value("${app.backend.url}")
-    private String backendUrl;
+    @Value("${email.verification.url}")
+    private String emailVerificationURL;
 
     public EmailService(@Value("${resend.api.key}") String apiKey) {
         this.resend = new Resend(apiKey);
     }
 
     public void sendVerificationEmail(String email, String token) {
-
-        String link = backendUrl + "/auth/verify?token=" + token;
+        String link = emailVerificationURL + "/auth/verify?token=" + token;
 
         SendEmailRequest request = SendEmailRequest.builder()
-                .from(fromEmail)
-                .to(email)
-                .subject("Verify your email")
-                .html(buildHtml(link))
-                .build();
+            .from(fromEmail)
+            .to(email)
+            .subject("Verify your email")
+            .html(buildHtml(link))
+            .build();
 
         try {
             resend.emails().send(request);
             log.info("Verification email sent to {}", email);
-
         } catch (ResendException e) {
             log.error("Failed to send verification email to {}", email, e);
             throw new IllegalStateException("Email service unavailable");
