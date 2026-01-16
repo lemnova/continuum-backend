@@ -44,8 +44,9 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth ->
                 auth
-                    // Endpoints públicos
+                    // 🔓 Endpoints públicos / infraestrutura
                     .requestMatchers(
+                        "/health",
                         "/auth/**",
                         "/system/**",
                         "/swagger-ui/**",
@@ -53,7 +54,7 @@ public class SecurityConfig {
                         "/swagger-ui.html"
                     )
                     .permitAll()
-                    // Todos os outros endpoints requerem autenticação
+                    // 🔐 Todo o resto exige JWT
                     .anyRequest()
                     .authenticated()
             )
@@ -69,9 +70,11 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // 🌐 CORS centralizado
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
+
         config.setAllowedOrigins(
             List.of(
                 "http://localhost:5173",
@@ -79,6 +82,7 @@ public class SecurityConfig {
                 "https://continuum-frontend.onrender.com"
             )
         );
+
         config.setAllowedMethods(
             List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
         );
@@ -89,18 +93,23 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source =
             new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 
+    // 🔐 Auth Provider
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider =
             new DaoAuthenticationProvider();
+
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
+
         return authProvider;
     }
 
+    // 🧠 Auth Manager
     @Bean
     public AuthenticationManager authenticationManager(
         AuthenticationConfiguration config
@@ -108,6 +117,7 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
+    // 🔑 Password encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
